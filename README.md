@@ -2,6 +2,8 @@
 
 Touchscreen Bluetooth MIDI controller for the ESP32-2432S028R "Cheap Yellow Display" (CYD).
 
+Special thanks to Brian Lough for putting together the resources on this board. Check out his repo for more examples: https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display
+
 ## What You Need
 
 - **ESP32-2432S028R (CYD)** - ~$15 from AliExpress/Amazon
@@ -25,18 +27,7 @@ In Arduino IDE Library Manager, install:
 - `ESP32-BLE-MIDI` by lathoub
 
 ### 3. Configure TFT_eSPI
-Edit `libraries/TFT_eSPI/User_Setup.h` and add:
-```cpp
-#define ILI9341_DRIVER
-#define TFT_MISO 12
-#define TFT_MOSI 13
-#define TFT_SCLK 14
-#define TFT_CS   15
-#define TFT_DC    2
-#define TFT_RST  -1
-#define TFT_BL   21
-#define TFT_BACKLIGHT_ON HIGH
-```
+Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the repo.
 
 ### 4. Upload Code
 1. Clone this repo and open `CYD_MIDI_Controller.ino`
