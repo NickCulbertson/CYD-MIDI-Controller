@@ -4,6 +4,28 @@ Touchscreen Bluetooth MIDI controller for the ESP32-2432S028R "Cheap Yellow Disp
 
 Special thanks to Brian Lough for putting together the resources on this board. Check out his repo for more examples: https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display
 
+## Features
+
+### 10 Interactive Modes
+
+- **KEYS** - Virtual piano keyboard with scale and key controls
+- **BEATS** - 16-step sequencer with 4 tracks and tempo control
+- **ZEN** - Ambient bouncing ball mode for generative music
+- **DROP** - Physics-based ball drop with customizable platforms
+- **RNG** - Random music generator for creative exploration
+- **XY PAD** - Touch-controlled X/Y pad for real-time parameter control
+- **ARP** - Arpeggiator with chord-based patterns
+- **GRID** - Grid piano with 4ths layout for unique playing style
+- **CHORD** - Auto-chord mode with diatonic chord progressions
+- **LFO** - Low-frequency oscillator for modulation effects
+
+### Core Features
+
+- **Bluetooth MIDI** - Wireless connection to DAWs and music software
+- **Touchscreen Interface** - Intuitive visual controls optimized for the CYD display
+- **Real-time Control** - Low-latency MIDI output
+- **Visual Feedback** - Responsive graphics
+
 ## What You Need
 
 - **ESP32-2432S028R (CYD)** - ~$15 from AliExpress/Amazon
