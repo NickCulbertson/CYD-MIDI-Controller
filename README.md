@@ -55,6 +55,7 @@ Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the r
 1. Clone this repo and open `CYD_MIDI_Controller.ino`
 2. Select board: `ESP32 Dev Module`
 3. Connect CYD and upload
+(Lower Upload Speed to `115200` if the sketch isn't uploading)
 
 ### 5. Connect
 1. Pair "CYD MIDI" via Bluetooth
@@ -62,6 +63,7 @@ Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the r
 
 ## Troubleshooting
 
+- **Upload Speed**: Lower it to `115200` if the sketch isn't uploading
 - **Blank screen**: Check TFT_eSPI pin configuration
 - **No touch**: Verify touchscreen library installation
 - **No Bluetooth**: Restart device and re-pair
