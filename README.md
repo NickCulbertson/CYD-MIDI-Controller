@@ -46,7 +46,7 @@ Special thanks to Brian Lough for putting together the resources on this board. 
 In Arduino IDE Library Manager, install:
 - `TFT_eSPI` by Bodmer
 - `XPT2046_Touchscreen` by Paul Stoffregen  
-- `ESP32-BLE-MIDI` by lathoub
+- `ESP32 BLE MIDI` by lathoub (if needed, part of the ESP32 Arduino Core)
 
 ### 3. Configure TFT_eSPI
 Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the repo.
