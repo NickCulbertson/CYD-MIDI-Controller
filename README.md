@@ -3,6 +3,7 @@
 Touchscreen Bluetooth MIDI controller for the ESP32-2432S028R "Cheap Yellow Display" (CYD).
 
 Special thanks to Brian Lough for putting together the resources on this board. Check out his repo for more examples: https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display
+Fix: Improved BLE advertising for Windows compatibility. See Post on Issue #2  - No changes on fonctionnalities
 
 ## Features
 
