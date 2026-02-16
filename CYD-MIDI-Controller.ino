@@ -101,8 +101,7 @@ class MIDICallbacks: public BLEServerCallbacks {
       for (int i = 0; i < 128; i++) {
         sendMIDI(0x80, i, 0);
       }
-      // Restart advertising so new connections can be made
-      BLEDevice::startAdvertising();
+      BLEDevice::startAdvertising(); // IMPORTANT
     }
 };
 
@@ -119,8 +118,9 @@ void setup() {
   tft.setRotation(1);
   pinMode(21, OUTPUT);
   digitalWrite(21, HIGH);
-  
-  // BLE MIDI Setup
+
+ /* 
+ // BLE MIDI Setup
   Serial.println("Initializing BLE MIDI...");
   BLEDevice::init("CYD MIDI");
   Serial.println("BLE Device initialized");
@@ -154,6 +154,55 @@ void setup() {
   advertising->setMaxPreferred(0x12);
   advertising->start();
   Serial.println("BLE Advertising started - Device discoverable as 'CYD MIDI'");
+  */
+  // BLE MIDI Setup
+Serial.println("Initializing BLE MIDI...");
+BLEDevice::init("CYD MIDI");
+
+BLEServer *server = BLEDevice::createServer();
+server->setCallbacks(new MIDICallbacks());
+
+BLEService *service = server->createService(BLEUUID(SERVICE_UUID));
+
+pCharacteristic = service->createCharacteristic(
+  BLEUUID(CHARACTERISTIC_UUID),
+  BLECharacteristic::PROPERTY_READ |
+  BLECharacteristic::PROPERTY_WRITE |
+  BLECharacteristic::PROPERTY_NOTIFY |
+  BLECharacteristic::PROPERTY_WRITE_NR
+);
+
+pCharacteristic->addDescriptor(new BLE2902());
+
+service->start();
+
+// ----------- WINDOWS-COMPATIBLE ADVERTISING -----------
+
+BLEAdvertising *advertising = BLEDevice::getAdvertising();
+
+BLEAdvertisementData advertisementData;
+BLEAdvertisementData scanResponseData;
+
+// Required flags
+advertisementData.setFlags(0x06);
+
+// THIS IS THE CRITICAL PART
+advertisementData.setCompleteServices(BLEUUID(SERVICE_UUID));
+
+// Device name in scan response
+scanResponseData.setName("CYD MIDI");
+
+advertising->setAdvertisementData(advertisementData);
+advertising->setScanResponseData(scanResponseData);
+
+// Optional but improves Windows compatibility
+advertising->setMinPreferred(0x06);
+advertising->setMinPreferred(0x12);
+
+advertising->start();
+
+Serial.println("BLE Advertising started - Windows compatible mode");
+
   
   // Initialize mode systems
   initializeKeyboardMode();
@@ -459,7 +508,6 @@ void enterMode(AppMode mode) {
 void exitToMenu() {
   currentMode = MENU;
   stopAllModes();
-  delay(50);
   drawMenu();
   updateStatus();
 }
