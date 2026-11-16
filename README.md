@@ -61,15 +61,16 @@ Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the r
 Tested with "ESP32 by Espressif Systems" 3.3.2.
 
 ### 5. Connect
-"CYD MIDI" is a Bluetooth MIDI device, so it won't appear in your computer's or phone's regular
-Bluetooth settings. Connect from MIDI settings instead:
-- **Mac**: Audio MIDI Setup → `Window` → `Show MIDI Studio` → the Bluetooth icon → `Connect` next to "CYD MIDI"
-- **iPhone/iPad**: in your music app's Bluetooth MIDI settings (GarageBand, AUM, Loopy Pro, Cubasis...)
-- **Windows**: Windows apps can't use Bluetooth MIDI on their own yet. Use a bridge such as
-  [MIDIberry](https://apps.microsoft.com/detail/9n39720h2m05) (from the Microsoft Store) or
-  [Perfect Bluetooth MIDI for Windows](https://github.com/mayerwin/Perfect-Bluetooth-MIDI-For-Windows)
-
-Then select "CYD MIDI" as a MIDI input in your DAW.
+"CYD MIDI" is a Bluetooth MIDI device:
+- **Mac**: Audio MIDI Setup → `Window` → `Show MIDI Studio` → the Bluetooth icon → `Connect` next to
+  "CYD MIDI". Then select "CYD MIDI" as a MIDI input in your DAW.
+- **iPhone/iPad**: connect from your music app's Bluetooth MIDI settings (GarageBand, AUM, Loopy Pro,
+  Cubasis...), not from the iPhone's Bluetooth settings.
+- **Windows**: many Windows DAWs need a bridge to use Bluetooth MIDI:
+  - [MIDIberry](https://apps.microsoft.com/detail/9n39720h2m05): pair "CYD MIDI" in Windows Bluetooth
+    settings, route it in MIDIberry to a virtual MIDI port (such as loopMIDI), then select that port in your DAW.
+  - [Perfect Bluetooth MIDI for Windows](https://github.com/mayerwin/Perfect-Bluetooth-MIDI-For-Windows):
+    follow its setup, connect "CYD MIDI" in it, then select its MIDI port in your DAW.
 
 ## Troubleshooting
 
@@ -78,7 +79,8 @@ Then select "CYD MIDI" as a MIDI input in your DAW.
 - **Upload Speed**: Lower it to `115200` if the sketch isn't uploading
 - **Blank screen**: Check TFT_eSPI pin configuration
 - **No touch**: Verify touchscreen library installation
-- **No Bluetooth**: Restart the CYD, then connect from MIDI settings as in step 5, not from Bluetooth settings
+- **No Bluetooth**: Restart the CYD, then connect as in step 5 (on Mac and iPhone/iPad from MIDI settings,
+  not Bluetooth settings)
 
 ## License
 

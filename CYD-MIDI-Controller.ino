@@ -91,6 +91,11 @@ class MIDICallbacks: public BLEServerCallbacks {
       }
       updateStatus();
     }
+    void onConnect(BLEServer* pServer, esp_ble_gatts_cb_param_t* param) {
+      // BLE MIDI asks for a connection interval of 15 ms or less (units of 1.25 ms: 11.25-15 ms),
+      // no peripheral latency, 4 s supervision timeout. The computer or phone has the final say.
+      pServer->updateConnParams(param->connect.remote_bda, 0x09, 0x0C, 0, 400);
+    }
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
       if (currentMode == MENU) {
@@ -103,6 +108,14 @@ class MIDICallbacks: public BLEServerCallbacks {
       }
       // Restart advertising so new connections can be made
       BLEDevice::startAdvertising();
+    }
+};
+
+// BLE MIDI: a read of the MIDI characteristic must return no data (sendMIDI leaves the last packet in it,
+// which a reconnecting computer or phone would otherwise read)
+class MIDICharacteristicCallbacks: public BLECharacteristicCallbacks {
+    void onRead(BLECharacteristic* characteristic) {
+      characteristic->setValue((uint8_t*)"", 0);
     }
 };
 
@@ -141,11 +154,13 @@ void setup() {
   );
 
   pCharacteristic->addDescriptor(new BLE2902());
+  pCharacteristic->setCallbacks(new MIDICharacteristicCallbacks());
   service->start();
   Serial.println("BLE Service started");
 
   // Advertising: flags and the MIDI service UUID in the advertisement, the name in the scan response.
-  // Windows ignores devices without the flags, and flags + 128-bit UUID + name don't fit in 31 bytes together.
+  // Windows ignores devices without the flags. Flags + 128-bit UUID + name would fill the 31-byte packet
+  // exactly, so the name goes in the scan response, leaving room in both.
   // (Thanks to yvesdomlaurent-netizen for finding this: PR #4, issue #2.)
   BLEAdvertising *advertising = server->getAdvertising();
   BLEAdvertisementData adData;
@@ -156,8 +171,6 @@ void setup() {
   advertising->setAdvertisementData(adData);
   advertising->setScanResponseData(scanData);
   advertising->setScanResponse(true);
-  advertising->setMinPreferred(0x06);
-  advertising->setMaxPreferred(0x12);
   advertising->start();
   Serial.println("BLE Advertising started - Device discoverable as 'CYD MIDI'");
   
