@@ -41,6 +41,9 @@ TFT_eSPI tft = TFT_eSPI();
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 uint8_t midiPacket[] = {0x80, 0x80, 0x00, 0x60, 0x7F};
+esp_gatt_if_t midiGattsIf = ESP_GATT_IF_NONE;
+volatile uint16_t midiConnId = 0;
+BLE2902 *midiCccd = nullptr;
 
 // Touch state
 TouchState touch;
@@ -111,8 +114,18 @@ class MIDICallbacks: public BLEServerCallbacks {
     }
 };
 
-// BLE MIDI: a read of the MIDI characteristic must return no data (sendMIDI leaves the last packet in it,
-// which a reconnecting computer or phone would otherwise read)
+// The GATT interface and connection id, for sendMIDI's notifications (the library keeps them private).
+// sendMIDI notifies from its own buffer and never stores into the characteristic, so a read of it always
+// returns no data, as BLE MIDI requires (e.g. when a computer or phone reconnects).
+void midiGattsEvents(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
+  if (event == ESP_GATTS_REG_EVT || event == ESP_GATTS_CONNECT_EVT)
+    midiGattsIf = gatts_if;
+  if (event == ESP_GATTS_CONNECT_EVT)
+    midiConnId = param->connect.conn_id;
+}
+
+// What a computer or phone writes to the characteristic (MIDI to the CYD, e.g. clock) is stored in it; a
+// read must still return no data. (Writes and reads both run on the BLE stack's task, one at a time.)
 class MIDICharacteristicCallbacks: public BLECharacteristicCallbacks {
     void onRead(BLECharacteristic* characteristic) {
       characteristic->setValue((uint8_t*)"", 0);
@@ -136,6 +149,7 @@ void setup() {
   // BLE MIDI Setup
   Serial.println("Initializing BLE MIDI...");
   BLEDevice::init("CYD MIDI");
+  BLEDevice::setCustomGattsHandler(midiGattsEvents);
   Serial.println("BLE Device initialized");
   
   BLEServer *server = BLEDevice::createServer();
@@ -153,7 +167,8 @@ void setup() {
     BLECharacteristic::PROPERTY_NOTIFY
   );
 
-  pCharacteristic->addDescriptor(new BLE2902());
+  midiCccd = new BLE2902();
+  pCharacteristic->addDescriptor(midiCccd);
   pCharacteristic->setCallbacks(new MIDICharacteristicCallbacks());
   service->start();
   Serial.println("BLE Service started");

@@ -15,14 +15,13 @@ Scale scales[] = {
 const int NUM_SCALES = 6;
 
 // MIDI utility functions
+// A MIDI message, as a BLE MIDI notification from its own buffer: the characteristic's stored value stays
+// empty (what a read must return), and nothing another task does can change a message on its way out
 void sendMIDI(byte cmd, byte note, byte vel) {
-  if (!deviceConnected) return;
-  
-  midiPacket[2] = cmd;
-  midiPacket[3] = note;
-  midiPacket[4] = vel;
-  pCharacteristic->setValue(midiPacket, 5);
-  pCharacteristic->notify();
+  if (!deviceConnected || midiGattsIf == ESP_GATT_IF_NONE) return;
+  if (midiCccd != nullptr && !midiCccd->getNotifications()) return;   // not listening yet
+  uint8_t packet[5] = {midiPacket[0], midiPacket[1], cmd, note, vel};  // header, timestamp, message
+  esp_ble_gatts_send_indicate(midiGattsIf, midiConnId, pCharacteristic->getHandle(), sizeof packet, packet, false);
 }
 
 int getNoteInScale(int scaleIndex, int degree, int octave) {
@@ -43,9 +42,13 @@ String getNoteNameFromMIDI(int midiNote) {
   return noteNames[noteIndex] + String(octave);
 }
 
+// MIDI panic (leaving a mode): All Notes Off, then a Note Off for every note, paced so Bluetooth's send
+// queue never overflows (128 at once could drop some, the very ones left sounding)
 void stopAllModes() {
+  sendMIDI(0xB0, 123, 0);   // All Notes Off
   for (int i = 0; i < 128; i++) {
     sendMIDI(0x80, i, 0);
+    delay(2);
   }
 }
 

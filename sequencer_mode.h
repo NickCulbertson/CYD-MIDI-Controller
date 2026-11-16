@@ -123,6 +123,15 @@ void handleSequencerMode() {
       if (sequencerPlaying) {
         currentStep = 0;
         lastStepTime = millis();
+      } else {
+        // STOP: end what's still sounding (updateSequencer stops looking once playback is off)
+        int drumNotes[] = {36, 38, 42, 46};
+        for (int track = 0; track < SEQ_TRACKS; track++) {
+          if (noteOffTime[track] > 0) {
+            sendMIDI(0x80, drumNotes[track], 0);
+            noteOffTime[track] = 0;
+          }
+        }
       }
       drawSequencerMode();
       return;
@@ -214,6 +223,12 @@ void playSequencerStep() {
   
   for (int track = 0; track < SEQ_TRACKS; track++) {
     if (sequencePattern[track][currentStep]) {
+      // Still sounding from an earlier step (its length outlasts a step at most tempos): end it first, or
+      // its Note Off would be overwritten and one Note On would never be turned off
+      if (noteOffTime[track] > 0) {
+        sendMIDI(0x80, drumNotes[track], 0);
+        noteOffTime[track] = 0;
+      }
       // Turn on note
       sendMIDI(0x90, drumNotes[track], 100);
       // Schedule note off

@@ -62,6 +62,10 @@ extern XPT2046_Touchscreen ts;
 extern BLECharacteristic *pCharacteristic;
 extern bool deviceConnected;
 extern uint8_t midiPacket[];
+class BLE2902;
+extern esp_gatt_if_t midiGattsIf;        // the GATT interface and connection sendMIDI notifies on
+extern volatile uint16_t midiConnId;     // (from the BLE stack's connect event: midiGattsEvents)
+extern BLE2902 *midiCccd;                // the MIDI characteristic's notify switch (the central turns it on)
 extern TouchState touch;
 extern AppMode currentMode;
 
