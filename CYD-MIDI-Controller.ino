@@ -134,21 +134,27 @@ void setup() {
   
   pCharacteristic = service->createCharacteristic(
     BLEUUID(CHARACTERISTIC_UUID),
-    BLECharacteristic::PROPERTY_READ | 
-    BLECharacteristic::PROPERTY_WRITE | 
+    BLECharacteristic::PROPERTY_READ |
+    BLECharacteristic::PROPERTY_WRITE |
+    BLECharacteristic::PROPERTY_WRITE_NR |   // BLE MIDI spec: write without response (Windows requires it)
     BLECharacteristic::PROPERTY_NOTIFY
   );
-  
+
   pCharacteristic->addDescriptor(new BLE2902());
   service->start();
   Serial.println("BLE Service started");
-  
+
+  // Advertising: flags and the MIDI service UUID in the advertisement, the name in the scan response.
+  // Windows ignores devices without the flags, and flags + 128-bit UUID + name don't fit in 31 bytes together.
+  // (Thanks to yvesdomlaurent-netizen for finding this: PR #4, issue #2.)
   BLEAdvertising *advertising = server->getAdvertising();
-  advertising->addServiceUUID(service->getUUID());
   BLEAdvertisementData adData;
-  adData.setName("CYD MIDI");
+  adData.setFlags(0x06);                 // LE General Discoverable, BR/EDR not supported
   adData.setCompleteServices(BLEUUID(SERVICE_UUID));
+  BLEAdvertisementData scanData;
+  scanData.setName("CYD MIDI");
   advertising->setAdvertisementData(adData);
+  advertising->setScanResponseData(scanData);
   advertising->setScanResponse(true);
   advertising->setMinPreferred(0x06);
   advertising->setMaxPreferred(0x12);

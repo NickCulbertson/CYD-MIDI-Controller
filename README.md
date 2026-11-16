@@ -51,21 +51,34 @@ In Arduino IDE Library Manager, install:
 Replace the `libraries/TFT_eSPI/User_Setup.h` with the `User_Setup.h` from the repo.
 
 ### 4. Upload Code
-1. Clone this repo and open `CYD_MIDI_Controller.ino`
-2. Select board: `ESP32 Dev Module`
-3. Connect CYD and upload
+1. Clone this repo, or download the ZIP and unzip it. The folder must be named `CYD-MIDI-Controller`
+   (rename `CYD-MIDI-Controller-main` if you downloaded the ZIP), with all the `.h` files inside it.
+2. Open `CYD-MIDI-Controller.ino` from that folder
+3. Select board: `ESP32 Dev Module`
+4. Connect CYD and upload
 (Lower Upload Speed to `115200` if the sketch isn't uploading)
 
+Tested with "ESP32 by Espressif Systems" 3.3.2.
+
 ### 5. Connect
-1. Pair "CYD MIDI" via Bluetooth
-2. Select as MIDI input in your DAW
+"CYD MIDI" is a Bluetooth MIDI device, so it won't appear in your computer's or phone's regular
+Bluetooth settings. Connect from MIDI settings instead:
+- **Mac**: Audio MIDI Setup → `Window` → `Show MIDI Studio` → the Bluetooth icon → `Connect` next to "CYD MIDI"
+- **iPhone/iPad**: in your music app's Bluetooth MIDI settings (GarageBand, AUM, Loopy Pro, Cubasis...)
+- **Windows**: Windows apps can't use Bluetooth MIDI on their own yet. Use a bridge such as
+  [MIDIberry](https://apps.microsoft.com/detail/9n39720h2m05) (from the Microsoft Store) or
+  [Perfect Bluetooth MIDI for Windows](https://github.com/mayerwin/Perfect-Bluetooth-MIDI-For-Windows)
+
+Then select "CYD MIDI" as a MIDI input in your DAW.
 
 ## Troubleshooting
 
+- **`keyboard_mode.h: No such file or directory`**: the `.ino` was opened on its own. Open it from the
+  `CYD-MIDI-Controller` folder with all the `.h` files (see step 4)
 - **Upload Speed**: Lower it to `115200` if the sketch isn't uploading
 - **Blank screen**: Check TFT_eSPI pin configuration
 - **No touch**: Verify touchscreen library installation
-- **No Bluetooth**: Restart device and re-pair
+- **No Bluetooth**: Restart the CYD, then connect from MIDI settings as in step 5, not from Bluetooth settings
 
 ## License
 
